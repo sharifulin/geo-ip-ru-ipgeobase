@@ -203,7 +203,10 @@ sub decode {
 
     my $decoder = $self->{'db'}{'decoder'};
     foreach my $rec ( ref($value) eq 'ARRAY'? (@$value) : ($value) ) {
-        $_ = $decoder->decode($_) foreach grep defined, values %$rec;
+        foreach (grep defined, values %$rec) {
+            my $d = eval { $decoder->decode($_, 1) };
+            $_ = $d unless $@;
+        }
     }
     return $value;
 }
